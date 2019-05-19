@@ -2,6 +2,7 @@ import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.util.*;
 
+import static java.lang.Integer.getInteger;
 import static java.lang.Integer.parseInt;
 
 public class Catalogo {
@@ -10,16 +11,16 @@ public class Catalogo {
 
     public Catalogo(){
         estoque = new HashMap<>();
-        Livro livro01 = new Livro("001", "Titulo 01", "Autor 01", 2001, "ISBN-01", 1, 1.5F);
-        Livro livro02 = new Livro("002", "Titulo 02", "Autor 02", 2002, "ISBN-02", 2, 2.5F);
-        Livro livro03 = new Livro("003", "Titulo 03", "Autor 03", 2003, "ISBN-03", 3, 3.5F);
-        Livro livro04 = new Livro("004", "Titulo 04", "Autor 04", 2004, "ISBN-04", 4, 4.5F);
-        Livro livro05 = new Livro("005", "Titulo 05", "Autor 05", 2005, "ISBN-05", 5, 5.5F);
-        Livro livro06 = new Livro("006", "Titulo 06", "Autor 06", 2006, "ISBN-06", 6, 6.5F);
-        Livro livro07 = new Livro("007", "Titulo 07", "Autor 07", 2007, "ISBN-07", 7, 7.5F);
-        Livro livro08 = new Livro("008", "Titulo 08", "Autor 08", 2008, "ISBN-08", 8, 8.5F);
-        Livro livro09 = new Livro("009", "Titulo 09", "Autor 09", 2009, "ISBN-09", 9, 9.5F);
-        Livro livro10 = new Livro("010", "Titulo 10", "Autor 10", 2010, "ISBN-10", 10, 10.5F);
+        Livro livro01 = new Livro("001", "A Cinco Passos De Você", "Rachael Lippincott", 2019, "9788525067425", 35, 23.9F);
+        Livro livro02 = new Livro("002", "A Garota do Lago", "Charlie Donlea", 2017, "9788562409882", 26, 11.9F);
+        Livro livro03 = new Livro("003", "Eleanor & Park", "Rainbow Rowell", 2014, "9788542810394", 8, 9.9F);
+        Livro livro04 = new Livro("004", "After", "Anna Todd", 2019, "9788584391370", 43, 35.9F);
+        Livro livro05 = new Livro("005", "Trono De Vidro", "Sarah J. Maas", 2019, "9788501116307", 57, 79.9F);
+        Livro livro06 = new Livro("006", "Admirável Mundo Novo", "Aldous Leonard Huxley", 2014, "9788525056009", 32, 27.9F);
+        Livro livro07 = new Livro("007", "Um Casamento Conveniente", "Tessa Dare", 2019, "9788582355831", 106, 39.8F);
+        Livro livro08 = new Livro("008", "1984", "George Orwell", 2009, "9788535914849", 27, 57.9F);
+        Livro livro09 = new Livro("009", "O Diário de Anne Frank", "Anne Frank", 1995, "8501044458", 92, 31.9F);
+        Livro livro10 = new Livro("010", "Os Miseráveis", "Victor Hugo", 2014, "9788544000007", 61, 56.9F);
 
         estoque.put(livro01.getCodigo(), livro01);
         estoque.put(livro02.getCodigo(), livro02);
@@ -33,7 +34,8 @@ public class Catalogo {
         estoque.put(livro10.getCodigo(), livro10);
     }
 
-    /////////////////////////////////////////////////////// MÉTODOS
+    public Map<String, Map<String, Livro>> colecoes = new HashMap<>();
+    public Map<String, Livro> curMap = null;
 
     ////////// Método para formatar os valores em R$ dos livros em duas casas decimais;
     DecimalFormat numberFormat = new DecimalFormat("#.00");
@@ -52,20 +54,56 @@ public class Catalogo {
                 "****************************************");
     }
 
-    ////////// Teste de formatação de texto, para apresentar as informações de forma visualmente mais agradável,
-    public void listaDeLivros(){
-
-        System.out.println("|--------------------|--------------------|--------------------|--------------------|--------------------|--------------------|--------------------|\n"+
-                "|                                                            LISTA COMPLETA DE ESTOQUE                                                             |\n"+
-                "|--------------------|--------------------|--------------------|--------------------|--------------------|--------------------|--------------------|\n"+
-                "|CÓDIGO              |TÍTULO              |AUTOR               |LANÇAMENTO          |ISBN                |ESTOQUE             |PREÇO               |\n"+
-                "|--------------------|--------------------|--------------------|--------------------|--------------------|--------------------|--------------------|");
-        for (String code :estoque.keySet()){
-            Livro livro = estoque.get(code);
-            catalogoFormatado(livro);
+    public String centralizarTitulo(String nomeDaLista, int spcAmt){
+        String spc = "";
+        for(int i=0; i<spcAmt;i++){
+            spc = spc+" ";
         }
-        System.out.println("|--------------------|--------------------|--------------------|--------------------|--------------------|--------------------|--------------------|");
+        String linhaDeTitulo;
+        String subSpc = spc.substring(0,spc.length()-(nomeDaLista.length()/2));
+        boolean divisaoIgual = false;
 
+        if(nomeDaLista.length()%2==0){
+            divisaoIgual=true;
+        }
+
+        if(divisaoIgual){
+            linhaDeTitulo = "|"+subSpc+nomeDaLista+subSpc+"|";
+            return linhaDeTitulo;
+        }else{
+            linhaDeTitulo = "|"+subSpc.substring(0,subSpc.length()-1)+nomeDaLista+subSpc+"|";
+            return linhaDeTitulo;
+        }
+    }
+
+    ////////// Teste de formatação de texto, para apresentar as informações de forma visualmente mais agradável,
+    public void listaDeLivros(String nomeDaLista, boolean tOrF){
+        String startEnd =     "+--------------------------------------------------------------------------------------------------------------------------------------------------+";
+        String space =        "|                                                                                                                                                  |";
+        String spaceLine =    "|--------------------------------------------------------------------------------------------------------------------------------------------------|";
+        String spaceLineDiv = "|--------------------|--------------------|--------------------|--------------------|--------------------|--------------------|--------------------|";
+        String categories =   "|CÓDIGO              |TÍTULO              |AUTOR               |LANÇAMENTO          |ISBN                |ESTOQUE             |PREÇO               |";
+
+        System.out.println(startEnd+"\n"+
+                space+"\n"+
+                centralizarTitulo(nomeDaLista, 73)+"\n"+
+                space+"\n"+
+                spaceLine+"\n"+
+                categories+"\n"+
+                spaceLineDiv);
+        if(tOrF){
+            for (String code :estoque.keySet()){
+                Livro livro = estoque.get(code);
+                catalogoFormatado(livro);
+            }
+        }else{
+            for (String code :curMap.keySet()){
+                Livro livro = curMap.get(code);
+                catalogoFormatado(livro);
+            }
+        }
+
+        System.out.println(startEnd);
     }
 
     ////////// Método usado em listaDeLivros(), para puxar as informações de cada livro e apresentá-las em uma linha, com espaçamento e formatação correta;
@@ -110,10 +148,10 @@ public class Catalogo {
     ////////// Método usado em userCadastrarLivro(), para criar um novo scanner que recebe uma String e validar se não está em branco;
     private String validString(String userInput){
         Scanner scn = new Scanner (System.in);
-        String theStr = scn.nextLine();
-        while(theStr.length()==0||theStr.substring(0,1).equals(" ")){
-            System.out.println("O campo \""+userInput+"\" não pode iniciar com um espaço em branco. Digite novamente:");
-            theStr = scn.nextLine();
+        String theStr = scn.nextLine().trim();
+        while(theStr.length()==0){
+            System.out.println("O campo \""+userInput+"\" não deve ficar em branco. Digite novamente:");
+            theStr = scn.nextLine().trim();
         }
         return theStr;
     }
@@ -128,7 +166,7 @@ public class Catalogo {
                 Integer.parseInt(str);
                 isParse = true;
             } catch (Exception e) {
-                System.out.println("O campo \"" + userInput + "\" só recebe números. Digite novamente:");
+                System.out.println("O campo \"" + userInput + "\" não aceita texto e só recebe números inteiros. Digite novamente:");
             }
         }
         return Integer.parseInt(str);
@@ -144,7 +182,7 @@ public class Catalogo {
                 Float.parseFloat(str);
                 isParse = true;
             } catch (Exception e) {
-                System.out.println("O campo \"" + userInput + "\" só recebe números. Digite novamente:");
+                System.out.println("O campo \"" + userInput + "\" só recebe números.\nObs: Para valores quebrados, use o ponto (exemplo: \"29.90\").\nDigite novamente:");
             }
         }
         return Float.parseFloat(str);
@@ -256,5 +294,157 @@ public class Catalogo {
 
             }
         }
+    }
+
+    ////////// Método usado para criar uma nova coleção, com interação do usuário;
+    public void novaColecao(){
+        System.out.println("Vamos criar uma nova coleção!\nDigite um nome único:");
+        String nomeDaColecao = validString("Nome da Coleção");
+        for (String code : colecoes.keySet()){
+            while(nomeDaColecao.equals(code)) {
+                System.out.println("Esta coleção já existe. Digite um nome único:");
+                nomeDaColecao = validString("Nome da Coleção");
+            }
+        }
+        System.out.println("Digite agora os códigos dos livros, separados por vírgula:");
+        String codigos = validString("Códigos dos Livros");
+        String[] array = codigos.split(",", -1);
+        boolean todosCodigosValidos = false;
+        List<String> invalidos = null;
+        List<String> validos = null;
+        while(!todosCodigosValidos){
+            invalidos = new ArrayList<>();
+            validos = new ArrayList<>();
+            for(int i=0; i<array.length; i++){
+                array[i] = array[i].trim();
+                Livro livSel = estoque.get(array[i]);
+                if(livSel == null){
+                    invalidos.add(array[i]);
+                }else{
+                    validos.add(array[i]);
+                }
+            }
+            if(invalidos.isEmpty()){
+                if(validos.size()>=2) {
+                    todosCodigosValidos = true;
+                }else{
+                    System.out.println("Não é possível criar uma coleção com apenas um livro.\nDigite dois ou mais gódigos, separados por vírgula:");
+                    codigos = validString("Códigos dos Livros");
+                    array = codigos.split(",", -1);
+                }
+            }else{
+                System.out.println("Os códigos \""+invalidos.toString()+"\" não foram encontrados no sistema.");
+                System.out.println("Certifique-se que esteja digitando-os corretamente.");
+                System.out.println("\nVamos tentar novamente. Digite os códigos dos livros, separados por vírgula:");
+                codigos = validString("Códigos dos Livros");
+                array = codigos.split(",", -1);
+            }
+        }
+
+        Map<String, Livro> novaColecao = new HashMap<>();
+        for(int i=0;i<validos.size();i++){
+            Livro curLiv = estoque.get(validos.get(i));
+            novaColecao.put(curLiv.getCodigo(), curLiv);
+        }
+        colecoes.put(nomeDaColecao, novaColecao);
+        System.out.println("\n\n***** COLEÇÃO CRIADA COM SUCESSO!! *****\n");
+        System.out.println("Confira abaixo as informações:");
+        infosDaColecao(nomeDaColecao);
+    }
+
+    ////////// Método usado para que o usuário possa buscar uma coleção;
+    public void userBuscarColecao(){
+        System.out.println("Digite o nome da coleção que está procurando:");
+        String colName = validString("Buscar Coleção");
+        Map<String, Livro> curCol = null;
+        while(curCol == null){
+            curCol = colecoes.get(colName);
+            if (curCol == null) {
+                System.out.println("Este código não existe. Digite novamente: ");
+                colName = validString("Buscar Coleção");;
+            }
+        }
+        infosDaColecao(colName);
+    }
+
+    ////////// Método usado para mostrar as infos de uma coleção já existente;
+    public void infosDaColecao(String nomeDaColecao){
+        String startEnd = "+--------------------------------------------------------------------------------------------------------------------------------------------------+";
+        curMap = colecoes.get(nomeDaColecao);
+        float vt = 0;
+        for (String code : curMap.keySet()){
+            vt = vt+curMap.get(code).getPreco();
+        }
+        listaDeLivros("COLEÇÃO: "+nomeDaColecao, false);
+        curMap = estoque;
+        String valorTotal = "VALOR TOTAL: R$ "+numberFormat.format(vt);
+        valorTotal = centralizarTitulo(valorTotal, 73);
+        System.out.println(valorTotal+"\n"+startEnd);
+    }
+
+    ////////// Método usado para mostrar as infos de todas as coleções;
+    public void todasColecoes(){
+        String startEnd =     "+-----------------------------------------------------------------------------------+";
+        String space =        "|                                                                                   |";
+        String spaceLine =    "|-----------------------------------------------------------------------------------|";
+        String spaceLineDiv = "|--------------------|--------------------|--------------------|--------------------|";
+        String categories =   "|NOME                |QTD DE LIVROS       |DISPONÍVEL P/ VENDA |VALOR TOTAL         |";
+        String titulo = centralizarTitulo("COLEÇÕES EM ESTOQUE ", 42);
+        titulo = "|"+titulo.substring(2);
+
+        String nome = "";
+        float valorTotal;
+        Integer qtdLivros;
+        Integer dispPVenda;
+
+        System.out.println("\n"+startEnd+"\n"+space+"\n"+titulo+"\n"+space+"\n"+spaceLineDiv+"\n"+categories+"\n"+spaceLineDiv);
+
+        for (String code : colecoes.keySet()){
+            qtdLivros = 0;
+            dispPVenda = 0;
+            valorTotal = 0;
+            boolean semEstoque = false;
+            Map<String, Livro> curCollect = colecoes.get(code);
+            nome = code;
+            for(String codeIn : curCollect.keySet()){
+                Livro curLiv = curMap.get(codeIn);
+                qtdLivros = qtdLivros+1;
+                valorTotal = valorTotal+curLiv.getPreco();
+                Integer qtDisp = curLiv.getQtdEstoque();
+                if(dispPVenda == 0 || dispPVenda>qtDisp) {
+                    dispPVenda = qtDisp;
+                }
+                if(qtDisp==0){
+                    semEstoque=true;
+                }
+            }
+
+            if(semEstoque){
+                dispPVenda=0;
+            }
+
+            List<String> listaDeAtributos = new ArrayList<>();
+            listaDeAtributos.add(nome);
+            listaDeAtributos.add(qtdLivros.toString());
+            listaDeAtributos.add(dispPVenda.toString());
+            listaDeAtributos.add("R$ "+ numberFormat.format(valorTotal));
+            String linhaFormatada = "";
+            for (String string :listaDeAtributos){
+                if(string.length()>17){
+                    string = string.substring(0,17)+"...";
+                } else {
+                    int theLen = 20-(string.length());
+                    for(int i = 0; i<theLen; i++){
+                        string = string+" ";
+                    }
+                }
+                string = string+"|";
+                linhaFormatada = linhaFormatada+string;
+            }
+            System.out.println("|"+linhaFormatada);
+        }
+        System.out.println(startEnd);
+        System.out.println("\nObs: o ítem \"DISPONÍVEL P/ VENDA\" compara as unidades disponíveis de cada livro das coleções,\n"+
+                "informando quantas coleções COMPLETAS estão disponíveis em estoque.");
     }
 }
